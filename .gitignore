@@ -1,0 +1,29 @@
+# # Ignore private keys and sensitive files
+# /private/*.key
+# /private/*.pem
+# /private/.rand
+
+# # Ignore certificates and signing requests
+# /certs/*.crt
+# /certs/*.pem
+# /certs/*.csr
+
+# # Ignore serial and index files used by the CA
+# /serial
+# /index.txt*
+*.attr
+
+# Ignore OpenSSL-generated directories and temp files
+/newcerts/*
+*.old
+*.bak
+*.tmp
+
+# Ignore any backup or editor files
+*~
+*.swp
+.DS_Store
+Thumbs.db
+
+# Optional: ignore your OpenSSL config if customized locally
+# openssl.cnf
