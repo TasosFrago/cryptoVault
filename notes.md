@@ -5,6 +5,8 @@ Reference:
 
 - [create-ca](https://arminreiter.com/2022/01/create-your-own-certificate-authority-ca-using-openssl/)
 
+- [use_ca](https://www.golinuxcloud.com/openssl-create-client-server-certificate/)
+
 ```bash
 $ cd cryptoVault
 cryptoVault $ mkdir ca
@@ -361,4 +363,6 @@ Sign the certificate? [y/n]:y
 Write out database with 1 new entries
 Database updated
 
+ca $ openssl verify -CAfile certs/ca.crt  certs/vault.crt
+certs/vault.crt: OK
 ```
