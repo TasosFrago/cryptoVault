@@ -1,52 +1,40 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import filedialog
+from tkinter import ttk, filedialog
 
+from base_page import BasePage
 
-class StoreFilePage(ttk.Frame):
+class StoreFilePage(BasePage):
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
-        self.controller = controller
-
+        super().__init__(parent, controller)
         self.file_to_store_var = tk.StringVar()
-        self.private_key_var = tk.StringVar()
 
-        ttk.Label(self, text="Store File", font=('Helvetica', 16)).grid(row=0, column=0, columnspan=3, pady=20, padx=10)
+        content_frame = ttk.Frame(self, style="Background.TFrame", padding=(30,30))
+        content_frame.pack(expand=True, fill=tk.BOTH)
 
-        ttk.Label(self, text="File to Store:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        self.file_to_store_entry = ttk.Entry(self, textvariable=self.file_to_store_var, width=30)
-        self.file_to_store_entry.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
-        store_browse_button = ttk.Button(self, text="Browse", command=self.browse_file_to_store)
-        store_browse_button.grid(row=1, column=2, padx=5, pady=5)
+        form_area = ttk.Frame(content_frame, style="Background.TFrame")
+        form_area.place(relx=0.5, rely=0.4, anchor=tk.CENTER) # Adjust rely for better centering
 
+        ttk.Label(form_area, text="Store a New File", style="SubHeader.TLabel").grid(row=0, column=0, columnspan=3, pady=(0,25), sticky="w")
+        ttk.Label(form_area, text="File to Store:").grid(row=1, column=0, padx=5, pady=8, sticky="w")
+        self.file_to_store_entry = ttk.Entry(form_area, textvariable=self.file_to_store_var, width=30)
+        self.file_to_store_entry.grid(row=1, column=1, padx=5, pady=8, sticky="ew")
+        store_browse_button = ttk.Button(form_area, text="Browse", command=self.browse_file_to_store, style="Link.TButton")
+        store_browse_button.grid(row=1, column=2, padx=(0,5), pady=8, sticky="e")
 
-        ttk.Label(self, text="Private Key File:").grid(row=2, column=0, padx=10, pady=5, sticky="w")
-        self.private_key_entry = ttk.Entry(self, textvariable=self.private_key_var, width=30)
-        self.private_key_entry.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
-        key_browse_button = ttk.Button(self, text="Browse", command=self.browse_private_key)
-        key_browse_button.grid(row=2, column=2, padx=5, pady=5)
+        button_frame = ttk.Frame(form_area, style="Background.TFrame")
+        button_frame.grid(row=2, column=0, columnspan=3, pady=(30,0)) # Adjusted row from 3 to 2
 
-        store_btn = ttk.Button(self, text="Store File",
-                               command=lambda: controller.store_file_action(self.file_to_store_var.get(), self.private_key_var.get()))
-        store_btn.grid(row=3, column=0, columnspan=3, pady=20)
+        store_btn = ttk.Button(button_frame, text="Store Securely", command=lambda: controller.store_file_action(self.file_to_store_var.get()))
+        store_btn.pack(side=tk.LEFT, padx=5, ipady=4, ipadx=10)
+        back_btn = ttk.Button(button_frame, text="Back to Menu", style="Link.TButton", command=lambda: controller.show_frame("AppPage"))
+        back_btn.pack(side=tk.LEFT, padx=5)
 
-        back_btn = ttk.Button(self, text="Back to App Menu",
-                                command=lambda: controller.show_frame("AppPage"))
-        back_btn.grid(row=4, column=0, columnspan=3, pady=10)
-
-        self.columnconfigure(1, weight=1) # Make entry expand
+        form_area.columnconfigure(1, weight=1)
 
     def browse_file_to_store(self):
-        filename = filedialog.askopenfilename(title="Select File to Store")
-        if filename:
-            self.file_to_store_var.set(filename)
-
-    def browse_private_key(self):
-        filename = filedialog.askopenfilename(title="Select Private Key File")
-        if filename:
-            self.private_key_var.set(filename)
-
+        filename = filedialog.askopenfilename(title="Select File to Store", parent=self)
+        if filename: self.file_to_store_var.set(filename)
+    
     def clear_entries(self):
         self.file_to_store_var.set("")
-        # Optionally clear private key, or maybe not for convenience
-        # self.private_key_var.set("")
+        if hasattr(self, 'file_to_store_entry'): self.file_to_store_entry.focus_set()

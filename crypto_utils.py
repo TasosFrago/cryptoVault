@@ -1,6 +1,5 @@
 import os
 from cryptography import x509
-from cryptography.hazmat.primitives.asymmetric.types import PrivateKeyTypes
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
@@ -10,21 +9,17 @@ from cryptography.exceptions import InvalidSignature, InvalidTag
 
 def generate_symmetric_key() -> bytes:
     """Generates a 256-bit key for AES-GCM."""
-    return AESGCM.generate_key(key_size=256)
+    return AESGCM.generate_key(bit_length=256)
 
-def symmetric_encrypt_gcm(key: bytes, plaintext_bytes: bytes, associated_data: bytes | None = None) -> bytes:
+def symmetric_encrypt_gcm(key: bytes, plaintext: bytes, associated_data: bytes | None = None) -> bytes:
     """
-    Encrypts plaintext using AES-GCM. Returns nonce + ciphertext. Nonce is 12 bytes, prepended.
+    Encrypts plaintext using AES-GCM.
+    Returns nonce + ciphertext. 
+    Nonce is 12 bytes, prepended.
     """
-    # FIX: not needed checks, if you type hint them in the definition
-    # if not isinstance(plaintext_bytes, bytes):
-    #     raise TypeError("plaintext_bytes must be bytes")
-    # if associated_data is not None and not isinstance(associated_data, bytes):
-    #     raise TypeError("associated_data must be bytes or None")
-
     nonce = os.urandom(12) # AES-GCM standard nonce size
     aesgcm = AESGCM(key)
-    ciphertext = aesgcm.encrypt(nonce, plaintext_bytes, associated_data)
+    ciphertext = aesgcm.encrypt(nonce, plaintext, associated_data)
     return nonce + ciphertext
 
 def symmetric_decrypt_gcm(key, nonce_ciphertext: bytes, associated_data: bytes|None = None) -> bytes | None:
@@ -33,14 +28,6 @@ def symmetric_decrypt_gcm(key, nonce_ciphertext: bytes, associated_data: bytes|N
     Extracts 12-byte nonce from the beginning.
     Returns plaintext_bytes or None if decryption fails.
     """
-    # FIX: not needed check, if you type hint it in the definition
-    # if not isinstance(nonce_ciphertext_bytes, bytes):
-    #     raise TypeError("nonce_ciphertext_bytes must be bytes")
-
-    # FIX: not needed check, if you type hint it in the definition
-    # if associated_data is not None and not isinstance(associated_data, bytes):
-    #     raise TypeError("associated_data must be bytes or None")
-
     nonce = nonce_ciphertext[:12]
     ciphertext = nonce_ciphertext[12:]
     aesgcm = AESGCM(key)
@@ -51,7 +38,7 @@ def symmetric_decrypt_gcm(key, nonce_ciphertext: bytes, associated_data: bytes|N
         print("Decryption failed: Invalid authentication tag (data integrity compromised).")
         return None
     
-def load_private_key(key_path: str, password: str|None =None) -> PrivateKeyTypes:
+def load_private_key(key_path: str, password: str|None = None) -> rsa.RSAPrivateKey:
     """Loads a PEM-encoded private key."""
     with open(key_path, "rb") as key_file:
         private_key = serialization.load_pem_private_key(
@@ -64,23 +51,20 @@ def load_private_key(key_path: str, password: str|None =None) -> PrivateKeyTypes
 
 def load_public_key_and_id_from_certificate_file(cert_path: str) -> tuple[rsa.RSAPublicKey, str | bytes]:
     """Loads a PEM-encoded X.509 certificate and returns its public key and user id."""
-    # TODO: find actual return type and fix the user_id list return
     with open(cert_path, "rb") as cert_file:
         cert = x509.load_pem_x509_certificate(cert_file.read())
+
     public_key = cert.public_key()
     if not isinstance(public_key, rsa.RSAPublicKey):
         raise TypeError("Extracted public key is not an RSA public public key.")
-    user_id = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)
-    print(f"DEBUG-HERE: user_id raw: {user_id}")
+
+    [user_id] = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)
     if not user_id:
         raise ValueError("No Common Name (CN) found in the certificate's subject.")
-    return (public_key, user_id[0].value)
+    return (public_key, user_id.value)
 
 def asymmetric_encrypt_oaep(public_key: rsa.RSAPublicKey, data: bytes) -> bytes:
     """Encrypts data_bytes using RSA-OAEP with the given public_key."""
-    # FIX: not needed check if you type hint it in the definition
-    # if not isinstance(data, bytes):
-    #     raise TypeError("data_bytes for asymmetric encryption must be bytes.")
     ciphertext = public_key.encrypt(
         data,
         asym_padding.OAEP(
@@ -93,9 +77,6 @@ def asymmetric_encrypt_oaep(public_key: rsa.RSAPublicKey, data: bytes) -> bytes:
 
 def asymmetric_decrypt_oaep(private_key: rsa.RSAPrivateKey, ciphertext: bytes) -> bytes | None:
     """Decrypts ciphertext_bytes using RSA-OAEP with the given private_key."""
-    # FIX: not needed check, if you type hint it in the definition
-    # if not isinstance(ciphertext_bytes, bytes):
-    #     raise TypeError("ciphertext_bytes for asymmetric decryption must be bytes.")
     try:
         plaintext = private_key.decrypt(
             ciphertext,
@@ -112,9 +93,6 @@ def asymmetric_decrypt_oaep(private_key: rsa.RSAPrivateKey, ciphertext: bytes) -
 
 def sign_data_pss(private_key: rsa.RSAPrivateKey, data_to_sign: bytes) -> bytes:
     """Signs data_to_sign_bytes using RSA-PSS with the given private_key."""
-    # FIX: not needed check, if you type hint it in the definition
-    # if not isinstance(data_to_sign_bytes, bytes):
-    #     raise TypeError("data_to_sign_bytes must be bytes.")
     signature = private_key.sign(
         data_to_sign,
         asym_padding.PSS(
@@ -125,14 +103,11 @@ def sign_data_pss(private_key: rsa.RSAPrivateKey, data_to_sign: bytes) -> bytes:
     )
     return signature
 
-def verify_signature_pss(public_key: rsa.RSAPublicKey, signature_bytes, data_that_was_signed: bytes) -> bool:
+def verify_signature_pss(public_key: rsa.RSAPublicKey, signature: bytes, data_that_was_signed: bytes) -> bool:
     """Verifies a signature using RSA-PSS."""
-    # FIX: not needed check, if you type hint it in the definition
-    # if not isinstance(signature_bytes, bytes) or not isinstance(data_that_was_signed_bytes, bytes):
-    #     raise TypeError("Signature and data for verification must be bytes.")
     try:
         public_key.verify(
-            signature_bytes,
+            signature,
             data_that_was_signed,
             asym_padding.PSS(
                 mgf = asym_padding.MGF1(hashes.SHA256()),
