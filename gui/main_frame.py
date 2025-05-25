@@ -5,15 +5,15 @@ import os
 import platform
 import subprocess
 
-import starting_page
-import login_page
-import registration_page
-import retrievefile_page
-import storefile_page
-import app_page
+from gui.starting_page import StartPage
+from gui.login_page import LoginPage
+from gui.retrievefile_page import RetrieveFilePage
+from gui.registration_page import RegisterPage
+from gui.storefile_page import StoreFilePage
+from gui.app_page import AppPage
 
-from user_actions import User, TEMP_DIR
-from vault_logic import BASE_STORAGE_PATH, Vault
+from crypto.user_actions import User, TEMP_DIR
+from crypto.vault_logic import BASE_STORAGE_PATH, Vault
 
 # --- Global Style Configuration (same as before) ---
 APP_FONT_FAMILY = "Segoe UI"
@@ -31,7 +31,7 @@ COLOR_BUTTON_HOVER = "#005999"
 class MainApp(ThemedTk):
     def __init__(self, *args, **kwargs):
         ThemedTk.__init__(self, *args, **kwargs)
-        self.set_theme("arc") # Or "breeze", "equilux", "adapta"
+        self.set_theme("arc")
         self.title("Crypto Vault")
         self.geometry("700x600")
 
@@ -54,7 +54,7 @@ class MainApp(ThemedTk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (starting_page.StartPage, login_page.LoginPage, registration_page.RegisterPage, app_page.AppPage, storefile_page.StoreFilePage, retrievefile_page.RetrieveFilePage):
+        for F in (StartPage, LoginPage, RegisterPage, AppPage, StoreFilePage, RetrieveFilePage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -105,7 +105,7 @@ class MainApp(ThemedTk):
             self.current_user = User(username, cert_file_path)
             usr_dir = os.path.join(BASE_STORAGE_PATH, self.current_user.vault_folder)
             if not os.path.exists(usr_dir):
-                raise Exception(f"User: {username} not register.")
+                raise Exception(f"User: {username} not registered.")
             messagebox.showinfo("Login Success", f"Welcome, {self.current_user.username_alias}!\nUser ID (from cert): {self.current_user.user_id}", parent=self.get_frame("LoginPage"))
             self.show_frame("AppPage")
         except Exception as e:
@@ -201,8 +201,3 @@ class MainApp(ThemedTk):
                     print(f"Failed to delete {file_path}: {e}")
 
             self.destroy()
-
-if __name__ == "__main__":
-    app = MainApp()
-    if hasattr(app, 'vault') and app.winfo_exists():
-        app.mainloop()

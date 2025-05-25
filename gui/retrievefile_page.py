@@ -1,18 +1,20 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 
-from base_page import BasePage
-from main_frame import (
-        APP_FONT_FAMILY,
-        APP_FONT_SIZE_NORMAL,
-        COLOR_ENTRY_BG,
-        COLOR_DARK_FG,
-        COLOR_PRIMARY,
-        COLOR_BUTTON_FG
-)
+import gui.base_page
+APP_FONT_FAMILY = "Segoe UI"
+APP_FONT_SIZE_NORMAL = 10
+APP_FONT_SIZE_LARGE = 12
+APP_FONT_SIZE_HEADER = 18
+COLOR_PRIMARY = "#007ACC"
+COLOR_LIGHT_BG = "#F5F5F5"
+COLOR_DARK_FG = "#333333"
+COLOR_ENTRY_BG = "#FFFFFF"
+COLOR_BUTTON_FG = "#565454"
+COLOR_BUTTON_HOVER = "#005999"
 
 
-class RetrieveFilePage(BasePage):
+class RetrieveFilePage(gui.base_page.BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
         self.user_private_key_var = tk.StringVar()

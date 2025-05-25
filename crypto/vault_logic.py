@@ -1,11 +1,11 @@
 import os
 import shutil
-import app_utils
-import crypto_utils
+import crypto.app_utils
+from crypto import crypto_utils
 
-BASE_STORAGE_PATH = app_utils.resource_path("vault_data")
-VAULT_PRIVATE_KEY_PATH = app_utils.resource_path("crypto_materials/vault_private_key.key")
-VAULT_CERT_PATH = app_utils.resource_path("crypto_materials/vault_certificate.crt")
+BASE_STORAGE_PATH = crypto.app_utils.resource_path("../vault_data")
+VAULT_PRIVATE_KEY_PATH = crypto.app_utils.resource_path("../crypto_materials/vault_private_key.key")
+VAULT_CERT_PATH = crypto.app_utils.resource_path("../crypto_materials/vault_certificate.crt")
 VAULT_KEY_PASSWORD = None
 
 class Vault:

@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 
-from base_page import BasePage
+import gui.base_page
 
-class RegisterPage(BasePage):
+class RegisterPage(gui.base_page.BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
         self.username_var = tk.StringVar()

@@ -1,11 +1,11 @@
 import os
 
-import app_utils
-import crypto_utils
-from vault_logic import Vault
+import crypto.app_utils
+from crypto import crypto_utils
+from crypto.vault_logic import Vault
 
-TEMP_DIR = app_utils.resource_path("temp_user_files")
-VAULT_CERT_PATH = app_utils.resource_path("crypto_materials/vault_certificate.crt")
+TEMP_DIR = crypto.app_utils.resource_path("../temp_user_files")
+VAULT_CERT_PATH = crypto.app_utils.resource_path("../crypto_materials/vault_certificate.crt")
 
 class User:
     def __init__(
@@ -121,10 +121,10 @@ class User:
                     data_that_was_signed += f_key.read()
 
                 with open(vault_sig_path, "rb") as f_sig:
-                    signature_bytes = f_sig.read()
+                    signature = f_sig.read()
 
                 # check for tampering
-                is_tampered_user_side = not crypto_utils.verify_signature_pss(vault_public_key, signature_bytes, data_that_was_signed)
+                is_tampered_user_side = not crypto_utils.verify_signature_pss(vault_public_key, signature, data_that_was_signed)
                 if is_tampered_user_side:
                     print(f"User '{self.username_alias}' confirms: Tampering detected based on Vault's signature and provided files.")
                 else:
@@ -147,9 +147,9 @@ class User:
 
             # read and decrypt the data file using the symmetric key
             with open(ret_enc_data_path, "rb") as f_enc_data:
-                nonce_plus_encrypted_data_bytes = f_enc_data.read()
+                nonce_plus_encrypted_data = f_enc_data.read()
 
-            original_data = crypto_utils.symmetric_decrypt_gcm(decrypted_symmetric_key, nonce_plus_encrypted_data_bytes)
+            original_data = crypto_utils.symmetric_decrypt_gcm(decrypted_symmetric_key, nonce_plus_encrypted_data)
             if not original_data:
                 print(f"User '{self.username_alias}' failed to decrypt data file for '{original_filename_tag}' (integrity tag mismatch or other AES-GCM decryption error).")
                 return None

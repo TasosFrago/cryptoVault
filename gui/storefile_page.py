@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 
-from base_page import BasePage
+import gui.base_page
 
-class StoreFilePage(BasePage):
+class StoreFilePage(gui.base_page.BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
         self.file_to_store_var = tk.StringVar()

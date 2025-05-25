@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 
-import base_page
+import gui.base_page
 
-class StartPage(base_page.BasePage):
+class StartPage(gui.base_page.BasePage):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
         content_frame = ttk.Frame(self, style="Background.TFrame")
