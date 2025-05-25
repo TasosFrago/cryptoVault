@@ -5,3 +5,5 @@ V	260524153448Z		1003	unknown	/C=GR/ST=Xanthi/O=cryptoVault/CN=user2
 V	260524153451Z		1004	unknown	/C=GR/ST=Xanthi/O=cryptoVault/CN=user3
 V	260524153457Z		1005	unknown	/C=GR/ST=Xanthi/O=cryptoVault/CN=user4
 V	260524153500Z		1006	unknown	/C=GR/ST=Xanthi/O=cryptoVault/CN=user5
+V	260524161415Z		1007	unknown	/C=GR/ST=Xanthi/O=cryptoVault/CN=paraskeuas
+V	260524161503Z		1008	unknown	/C=GR/ST=Xanthi/O=cryptoVault/CN=tasos
